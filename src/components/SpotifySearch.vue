@@ -6,6 +6,8 @@
       </router-link>
     </button>
     <div class="mult" v-if="my_bearer_token != null">
+      <button v-on:click="currentlyPlaying">{{getCurrent}}</button>
+      
       <multiselect
       v-model = "song_picked"
       placeholder ="Search for a song"
@@ -57,7 +59,10 @@ export default {
       colorArray : ["red","black"],
       numberArray : [],
       current : " 1 ",
-      theMetrnome : null
+      theMetrnome : null,
+      getCurrent : "Would you like to use your current song?",
+      theRepeater : null,
+      repeatData : null
     }
   },
   computed: {
@@ -81,7 +86,27 @@ export default {
     },
     currentlyPlaying(){
       let vm = this
+      var time_left = 100
+      vm.theRepeater = setInterval(function(){
+       axios.get("https://api.spotify.com/v1/me/player/currently-playing?access_token="+vm.my_bearer_token)
+      .then(function(response){
+          
+          vm.repeatData = response.data
+          time_left = vm.repeatData.item.duration_ms - vm.repeatData.progress_ms
+          //MAKE THIS song_picked
+          vm.song_picked = 
+          {
+            songID: response.data.item.id
+          }
+          
+          
+          
+          vm.select(vm.song_picked)
+        
+      })
+      
 
+      }, time_left)
     },
     myTimer(){
       let vm = this
@@ -97,11 +122,13 @@ export default {
       
     },
     select(selectedOption){
+      
       let vm = this
       var id = selectedOption.songID
-      
+      vm.numberArray = []
       axios.get("https://api.spotify.com/v1/audio-features/"+id+"?access_token="+vm.my_bearer_token)
       .then(function(response){
+        debugger
         vm.song_data = response.data
         for(var i = 0; i<vm.song_data.time_signature;i++){
           vm.numberArray[i] = " "+(i+1)+" "

@@ -38,7 +38,7 @@ export default {
   },
   methods: {
       spotifyAuthorize: function(event){
-          var scopes = 'user-read-private user-read-email user-read-birthdate'
+          var scopes = 'user-read-private user-read-email user-read-birthdate user-read-currently-playing'
           var redirect_uri = 'http://localhost:8080'
           location = ('https://accounts.spotify.com/authorize' +
             '?response_type=token' +
